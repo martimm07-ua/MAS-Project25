@@ -73,7 +73,7 @@ function renderLogin(createMode=false){
   app.innerHTML = `
     <main class="login-page">
       <section class="login-card">
-        <div class="brand"><div><img src="logo-usit.png" width = 100></div></div>
+        <div class="brand"><div><img src="logo-usit.png" width = 500></div></div>
         <div class="login-title">
           <h1>${createMode ? 'Criar conta' : 'Bem-vindo à Usit'}</h1>
           <p>use it. share it.</p>
@@ -135,7 +135,7 @@ function layout(content, active='explore'){
   return `
     <div class="shell">
       <aside class="sidebar">
-        <div class="brand"><div><img src="logo-usit.png" width = 100></div></div>
+        <div class="brand"><div><img src="logo-usit.png" width = 500></div></div>
         <nav class="nav">${navHtml}</nav>
         <div class="sidebar-footer">
           <div class="profile-chip"><div class="avatar">${u.name.slice(0,1).toUpperCase()}</div><div style="min-width:0"><strong>${u.name}</strong><div class="tiny">${roleLabel(u.role)}</div></div></div>
@@ -143,7 +143,7 @@ function layout(content, active='explore'){
         </div>
       </aside>
       <main class="content">
-        <div class="topbar"><div class="mobile-brand"><div><img src="logo-usit.png" width = 100></div></div><h1>${pageTitle(active)}</h1><button class="btn ghost" id="logoutB">Sair</button></div>
+        <div class="topbar"><div class="mobile-brand"><div><img src="logo-usit.png" width = 500></div></div><h1>${pageTitle(active)}</h1><button class="btn ghost" id="logoutB">Sair</button></div>
         <section class="view">${content}</section>
       </main>
       <nav class="mobile-nav"><div class="nav">${navHtml}</div></nav>
