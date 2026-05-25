@@ -68,6 +68,7 @@ function itemMedia(item){
   }
   return (item && item.emoji) || '📦';
 }
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 function uid(prefix){ return `${prefix}${Math.random().toString(36).slice(2,8)}${Date.now().toString(36).slice(-4)}`; }
 function money(v){ return `${Number(v || 0).toFixed(2).replace('.', ',')}€`; }
 function user(){ return state.users.find(u => u.id === state.currentUserId) || null; }
@@ -169,13 +170,14 @@ function layout(content, active='explore'){
 }
 function navItems(role){
   if(role==='admin') return [
-        {id:'admin', label:'Dashboard', icon:'<i class="fa-solid fa-chart-column"></i>'}, {id:'admin-users', label:'Utilizadores', icon:'<i class="fa-solid fa-users"></i>'}, {id:'admin-risk', label:'Risco', icon:'<i class="fa-solid fa-user-shield"></i>'}
+    {id:'admin', label:'Dashboard', icon:'<i class="fa-solid fa-chart-column"></i>'}, {id:'admin-users', label:'Utilizadores', icon:'<i class="fa-solid fa-users"></i>'}, {id:'admin-risk', label:'Risco', icon:'<i class="fa-solid fa-user-shield"></i>'}
   ];
   if(role==='partner') return [
-        {id:'partner', label:'Dashboard', icon:'<i class="fa-solid fa-chart-column"></i>'}, {id:'partner-items', label:'Itens', icon:'<i class="fa-solid fa-cubes"></i>'}, {id:'partner-billing', label:'Faturação', icon:'<i class="fa-solid fa-receipt"></i>'}
+    {id:'partner', label:'Dashboard', icon:'<i class="fa-solid fa-chart-column"></i>'}, {id:'partner-items', label:'Itens', icon:'<i class="fa-solid fa-cubes"></i>'}, {id:'partner-billing', label:'Faturação', icon:'<i class="fa-solid fa-receipt"></i>'}
+
   ];
   return [
-        {id:'explore', label:'Explorar', icon:'<i class="fa-solid fa-magnifying-glass"></i>'}, {id:'items', label:'Os meus itens', icon:'<i class="fa-solid fa-cubes"></i>'}, {id:'messages', label:'Mensagens', icon:'<i class="fa-regular fa-comment-dots"></i>'}, {id:'reservations', label:'Reservas', icon:'<i class="fa-regular fa-calendar-days"></i>'}, {id:'profile', label:'Perfil', icon:'<i class="fa-solid fa-user"></i>'}
+    {id:'explore', label:'Explorar', icon:'<i class="fa-solid fa-magnifying-glass"></i>'}, {id:'items', label:'Os meus itens', icon:'<i class="fa-solid fa-cubes"></i>'}, {id:'messages', label:'Mensagens', icon:'<i class="fa-regular fa-comment-dots"></i>'}, {id:'reservations', label:'Reservas', icon:'<i class="fa-regular fa-calendar-days"></i>'}, {id:'profile', label:'Perfil', icon:'<i class="fa-solid fa-user"></i>'}
   ];
 }
 function roleLabel(role){ return role==='admin'?'Administrador':role==='partner'?'Parceiro comercial':'Utilizador comum'; }
