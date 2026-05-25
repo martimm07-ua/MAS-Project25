@@ -20,11 +20,11 @@ const demo = {
     { id:'partner1', role:'partner', name:'Parceiro Comercial', email:'parceiro@usit.pt', password:'parceiro123', company:'ToolHub Lisboa', location:'Lisboa, Alvalade' }
   ],
   items: [
-    { id:'i1', ownerId:'u2', ownerName:'Carla Costa', title:'Berbequim Elétrico Bosch', category:'Ferramentas', description:'Berbequim compacto para pequenas reparações domésticas. Inclui mala e brocas básicas.', location:'Lisboa, Benfica', distance:0.8, price:5, deposit:25, status:'Ativo', verified:true, emoji:'🔩', views:46, partner:false, conditions:'Entregar limpo e sem danos visíveis.', available:['2026-05-22','2026-05-23','2026-05-24','2026-05-25','2026-05-28'] },
-    { id:'i2', ownerId:'partner1', ownerName:'ToolHub Lisboa', title:'Máquina de Lavar Roupa', category:'Casa', description:'Máquina para aluguer pontual em mudanças, eventos ou situações temporárias.', location:'Lisboa, Alvalade', distance:1.2, price:15, deposit:80, status:'Alugado', verified:false, emoji:'🧺', views:68, partner:true, conditions:'Recolha em loja. Transporte a cargo do locatário.', available:['2026-05-26','2026-05-27','2026-05-29'] },
-    { id:'i3', ownerId:'u2', ownerName:'Carla Costa', title:'Escada Extensível', category:'Ferramentas', description:'Escada extensível para trabalhos de pintura e pequenas reparações.', location:'Lisboa, Benfica', distance:0.9, price:7, deposit:30, status:'Não disponível', verified:false, emoji:'🪜', views:21, partner:false, conditions:'Usar em piso estável.', available:['2026-05-30'] },
-    { id:'i4', ownerId:'u2', ownerName:'Carla Costa', title:'Bicicleta de Montanha', category:'Desporto', description:'Bicicleta para trilhos leves e passeios urbanos.', location:'Lisboa, Parque das Nações', distance:2.5, price:8, deposit:45, status:'Ativo', verified:true, emoji:'🚲', views:39, partner:false, conditions:'Devolver com pneus cheios.', available:['2026-05-22','2026-05-23','2026-05-24','2026-05-26'] },
-    { id:'i5', ownerId:'partner1', ownerName:'ToolHub Lisboa', title:'Projetor Full HD', category:'Eletrónicos', description:'Projetor Full HD para apresentações, aulas e eventos pequenos.', location:'Lisboa, Saldanha', distance:1.8, price:12, deposit:60, status:'Ativo', verified:false, emoji:'📽️', views:88, partner:true, conditions:'Inclui cabo HDMI. Não usar no exterior com chuva.', available:['2026-05-22','2026-05-25','2026-05-28','2026-05-29'] }
+    { id:'i1', ownerId:'u2', ownerName:'Carla Costa', title:'Berbequim Elétrico Bosch', category:'Ferramentas', description:'Berbequim compacto para pequenas reparações domésticas. Inclui mala e brocas básicas.', location:'Lisboa, Benfica', distance:0.8, price:5, deposit:25, status:'Ativo', verified:true, emoji:'🔩', image:'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&auto=format&fit=crop&q=80', views:46, partner:false, conditions:'Entregar limpo e sem danos visíveis.', available:['2026-05-22','2026-05-23','2026-05-24','2026-05-25','2026-05-28'] },
+    { id:'i2', ownerId:'partner1', ownerName:'ToolHub Lisboa', title:'Máquina de Lavar Roupa', category:'Casa', description:'Máquina para aluguer pontual em mudanças, eventos ou situações temporárias.', location:'Lisboa, Alvalade', distance:1.2, price:15, deposit:80, status:'Alugado', verified:false, emoji:'🧺', image:'https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?w=800&auto=format&fit=crop&q=80', views:68, partner:true, conditions:'Recolha em loja. Transporte a cargo do locatário.', available:['2026-05-26','2026-05-27','2026-05-29'] },
+    { id:'i3', ownerId:'u2', ownerName:'Carla Costa', title:'Escada Extensível', category:'Ferramentas', description:'Escada extensível para trabalhos de pintura e pequenas reparações.', location:'Lisboa, Benfica', distance:0.9, price:7, deposit:30, status:'Não disponível', verified:false, emoji:'🪜', image:'https://images.unsplash.com/photo-1574359411659-15573a27fd0c?w=800&auto=format&fit=crop&q=80', views:21, partner:false, conditions:'Usar em piso estável.', available:['2026-05-30'] },
+    { id:'i4', ownerId:'u2', ownerName:'Carla Costa', title:'Bicicleta de Montanha', category:'Desporto', description:'Bicicleta para trilhos leves e passeios urbanos.', location:'Lisboa, Parque das Nações', distance:2.5, price:8, deposit:45, status:'Ativo', verified:true, emoji:'🚲', image:'https://images.unsplash.com/photo-1511994298241-608e28f14fde?w=800&auto=format&fit=crop&q=80', views:39, partner:false, conditions:'Devolver com pneus cheios.', available:['2026-05-22','2026-05-23','2026-05-24','2026-05-26'] },
+    { id:'i5', ownerId:'partner1', ownerName:'ToolHub Lisboa', title:'Projetor Full HD', category:'Eletrónicos', description:'Projetor Full HD para apresentações, aulas e eventos pequenos.', location:'Lisboa, Saldanha', distance:1.8, price:12, deposit:60, status:'Ativo', verified:false, emoji:'📽️', image:'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=800&auto=format&fit=crop&q=80', views:88, partner:true, conditions:'Inclui cabo HDMI. Não usar no exterior com chuva.', available:['2026-05-22','2026-05-25','2026-05-28','2026-05-29'] }
   ],
   reservations: [
     { id:'r1', itemId:'i2', itemTitle:'Máquina de Lavar Roupa', ownerId:'partner1', locatarioId:'u1', start:'2026-05-21', end:'2026-05-22', days:2, total:110.6, state:'Confirmada', paid:true, received:false, createdAt:'2026-05-18' },
@@ -45,12 +45,29 @@ let state = load();
 function load(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw) return JSON.parse(raw);
+    if(raw){
+      const loaded = JSON.parse(raw);
+      if(Array.isArray(loaded.items)){
+        loaded.items.forEach(it => {
+          if(!it.image){
+            const seed = demo.items.find(d => d.id === it.id);
+            if(seed && seed.image) it.image = seed.image;
+          }
+        });
+      }
+      return loaded;
+    }
   }catch(e){ console.warn(e); }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(demo));
   return structuredClone(demo);
 }
-function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function itemMedia(item){
+  if(item && item.image){
+    const fallback = (item.emoji || '📦').replace(/'/g, "\\'");
+    return `<img src="${item.image}" alt="${item.title || ''}" loading="lazy" onerror="this.outerHTML='${fallback}'">`;
+  }
+  return (item && item.emoji) || '📦';
+}
 function uid(prefix){ return `${prefix}${Math.random().toString(36).slice(2,8)}${Date.now().toString(36).slice(-4)}`; }
 function money(v){ return `${Number(v || 0).toFixed(2).replace('.', ',')}€`; }
 function user(){ return state.users.find(u => u.id === state.currentUserId) || null; }
@@ -211,7 +228,7 @@ function renderItemsList(){
   $('#itemsList').innerHTML = items.map(itemCard).join('') || `<div class="card"><h3>Sem resultados</h3><p>Altera a pesquisa ou escolhe outra categoria.</p></div>`;
 }
 function itemCard(i){
-  return `<article class="item-card"><div class="item-img">${i.emoji}</div><div class="item-info"><h3>${i.title}</h3><p>📍 ${i.location} · ${i.distance} km</p><p class="price">${money(i.price)}/dia</p><div class="status-line"><span class="badge ${i.verified?'success':'gray'}">${i.verified?'Verificado':'Por verificar'}</span><span class="badge ${i.status==='Ativo'?'success':'warn'}">${i.status}</span></div></div><div class="item-actions"><button class="btn secondary" data-detail="${i.id}">Ver detalhes</button></div></article>`;
+  return `<article class="item-card"><div class="item-img">${itemMedia(i)}</div><div class="item-info"><h3>${i.title}</h3><p>📍 ${i.location} · ${i.distance} km</p><p class="price">${money(i.price)}/dia</p><div class="status-line"><span class="badge ${i.verified?'success':'gray'}">${i.verified?'Verificado':'Por verificar'}</span><span class="badge ${i.status==='Ativo'?'success':'warn'}">${i.status}</span></div></div><div class="item-actions"><button class="btn secondary" data-detail="${i.id}">Ver detalhes</button></div></article>`;
 }
 
 function viewDetail(){
@@ -221,7 +238,7 @@ function viewDetail(){
   return `
     <button class="btn ghost" data-view="explore">← Voltar</button>
     <div class="detail-layout">
-      <div class="card"><div class="big-visual">${i.emoji}</div><h2>${i.title}</h2><p>${i.description}</p><div class="status-line"><span class="badge">${i.category}</span><span class="badge ${i.verified?'success':'gray'}">${i.verified?'Verificado':'Por verificar'}</span><span class="badge ${i.status==='Ativo'?'success':'warn'}">${i.status}</span></div><div class="section-title"><h2>Condições</h2></div><p>${i.conditions}</p><p class="muted">Proprietário: ${i.ownerName} · ${i.location}</p></div>
+      <div class="card"><div class="big-visual">${itemMedia(i)}</div><h2>${i.title}</h2><p>${i.description}</p><div class="status-line"><span class="badge">${i.category}</span><span class="badge ${i.verified?'success':'gray'}">${i.verified?'Verificado':'Por verificar'}</span><span class="badge ${i.status==='Ativo'?'success':'warn'}">${i.status}</span></div><div class="section-title"><h2>Condições</h2></div><p>${i.conditions}</p><p class="muted">Proprietário: ${i.ownerName} · ${i.location}</p></div>
       <aside class="card"><h3>Solicitar aluguer</h3><div class="summary-box"><div class="summary-row"><span>Preço diário</span><strong>${money(i.price)}</strong></div><div class="summary-row"><span>Caução</span><strong>${money(i.deposit)}</strong></div><div class="summary-row"><span>Comissão Usit</span><strong>2%</strong></div></div><form id="requestForm" class="login-form"><div><label>Data de início</label><input class="input" type="date" id="startDate" min="${min}" required></div><div><label>Data de fim</label><input class="input" type="date" id="endDate" min="${min}" required></div><div class="summary-box" id="costBox"><div class="summary-row"><span>Total estimado</span><strong>Seleciona datas</strong></div></div><button class="btn primary full" ${i.status!=='Ativo'?'disabled':''}>Confirmar pedido</button></form></aside>
     </div>
   `;
@@ -235,7 +252,7 @@ function viewItems(){
   const incoming = state.reservations.filter(r=>r.ownerId===u.id);
   return `
     <div class="section-title"><h2>Itens publicados</h2><button class="btn primary" data-view="add">+ Adicionar item</button></div>
-    <div class="grid two">${own.map(i=>`<div class="card"><div class="item-card" style="box-shadow:none;border:none;padding:0"><div class="item-img">${i.emoji}</div><div class="item-info"><h3>${i.title}</h3><p class="price">${money(i.price)}/dia</p><span class="badge ${i.status==='Ativo'?'success':i.status==='Alugado'?'warn':'gray'}">${i.status}</span></div></div><div class="status-line"><button class="btn ghost" data-toggle-status="${i.id}">Alternar estado</button><button class="btn ghost" data-edit-item="${i.id}">Editar</button></div></div>`).join('') || `<div class="card"><h3>Ainda não tens itens</h3><p>Publica o teu primeiro equipamento para começar.</p></div>`}</div>
+    <div class="grid two">${own.map(i=>`<div class="card"><div class="item-card" style="box-shadow:none;border:none;padding:0"><div class="item-img">${itemMedia(i)}</div><div class="item-info"><h3>${i.title}</h3><p class="price">${money(i.price)}/dia</p><span class="badge ${i.status==='Ativo'?'success':i.status==='Alugado'?'warn':'gray'}">${i.status}</span></div></div><div class="status-line"><button class="btn ghost" data-toggle-status="${i.id}">Alternar estado</button><button class="btn ghost" data-edit-item="${i.id}">Editar</button></div></div>`).join('') || `<div class="card"><h3>Ainda não tens itens</h3><p>Publica o teu primeiro equipamento para começar.</p></div>`}</div>
     <div class="section-title"><h2>Pedidos recebidos</h2></div>
     <div class="item-list">${incoming.map(reservationCard).join('') || `<div class="card"><p>Sem pedidos recebidos.</p></div>`}</div>
   `;
@@ -310,7 +327,7 @@ function renderAdmin(){
 }
 function renderPartner(){
   const v=state.activeView; const u=user(); const items=state.items.filter(i=>i.ownerId===u.id); const res=state.reservations.filter(r=>r.ownerId===u.id); const paid=res.filter(r=>r.paid).reduce((s,r)=>s+r.total,0); let body='';
-  if(v==='partner-items') body = `<div class="section-title"><h2>Inventário do parceiro</h2></div><div class="grid two">${items.map(i=>`<div class="card"><div class="item-card" style="box-shadow:none;border:none;padding:0"><div class="item-img">${i.emoji}</div><div class="item-info"><h3>${i.title}</h3><p>${i.views} visualizações</p><p class="price">${money(i.price)}/dia</p></div></div></div>`).join('') || `<div class="card"><p>Sem itens.</p></div>`}</div>`;
+  if(v==='partner-items') body = `<div class="section-title"><h2>Inventário do parceiro</h2></div><div class="grid two">${items.map(i=>`<div class="card"><div class="item-card" style="box-shadow:none;border:none;padding:0"><div class="item-img">${itemMedia(i)}</div><div class="item-info"><h3>${i.title}</h3><p>${i.views} visualizações</p><p class="price">${money(i.price)}/dia</p></div></div></div>`).join('') || `<div class="card"><p>Sem itens.</p></div>`}</div>`;
   else if(v==='partner-billing') body = `<div class="card"><h3>Faturação e reservas</h3><div class="table-wrap"><table class="table"><thead><tr><th>Reserva</th><th>Estado</th><th>Valor</th><th>Pago</th></tr></thead><tbody>${res.map(r=>`<tr><td>${r.itemTitle}</td><td>${r.state}</td><td>${money(r.total)}</td><td>${r.paid?'Sim':'Não'}</td></tr>`).join('') || `<tr><td colspan="4">Sem reservas.</td></tr>`}</tbody></table></div></div>`;
   else body = `<div class="hero"><div><h2>Área do parceiro</h2><p>Consulta desempenho dos anúncios, reservas e ganhos associados ao teu inventário.</p></div><div class="hero-panel"><strong>${money(paid)}</strong><span>volume associado ao parceiro</span></div></div><div class="grid four"><div class="stat-card"><span>Itens</span><strong>${items.length}</strong></div><div class="stat-card"><span>Visualizações</span><strong>${items.reduce((s,i)=>s+i.views,0)}</strong></div><div class="stat-card"><span>Reservas</span><strong>${res.length}</strong></div><div class="stat-card"><span>Valor pago</span><strong>${money(paid)}</strong></div></div><div class="card"><h3>Desempenho por item</h3><div class="chart">${barChart(items.map(i=>({cat:i.title,value:i.views})))}</div></div>`;
   app.innerHTML = layout(body, v.startsWith('partner')?v:'partner'); bindShell();
