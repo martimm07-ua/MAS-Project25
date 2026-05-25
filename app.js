@@ -4,12 +4,12 @@ const app = $('#app');
 const toastEl = $('#toast');
 
 const categories = [
-  { id:'Ferramentas', icon:'🔧' },
-  { id:'Eletrónicos', icon:'📱' },
-  { id:'Casa', icon:'🏠' },
-  { id:'Eventos', icon:'🎉' },
-  { id:'Fotografia', icon:'📷' },
-  { id:'Desporto', icon:'🚲' }
+  { id:'Ferramentas', icon:'<i class="fa-solid fa-wrench"></i>' },
+  { id:'Eletrónicos', icon:'<i class="fa-solid fa-computer"></i>' },
+  { id:'Casa', icon:'<i class="fa-solid fa-house-chimney"></i>' },
+  { id:'Eventos', icon:'<i class="fa-solid fa-champagne-glasses"></i>' },
+  { id:'Fotografia', icon:'<i class="fa-solid fa-camera-retro"></i>' },
+  { id:'Desporto', icon:'<i class="fa-solid fa-football"></i>' }
 ];
 
 const demo = {
@@ -88,8 +88,8 @@ function renderLogin(createMode=false){
           <div class="login-form">
             <div class="divider">ou continuar com</div>
             <div class="social">
-              <button class="btn ghost full" id="googleBtn">G Entrar com Google</button>
-              <button class="btn ghost full" id="appleBtn"> Entrar com Apple ID</button>
+              <button class="btn ghost full" id="googleBtn"><i class="fa-brands fa-google"></i>Entrar com Google</button>
+              <button class="btn ghost full" id="appleBtn"><i class="fa-brands fa-apple"></i>Entrar com Apple ID</button>
             </div>
           </div>
         ` : ''}
@@ -191,7 +191,7 @@ function viewExplore(){
     <div class="hero"><div><h2>Encontra o que precisas sem comprar.</h2><p>Pesquisa ferramentas, eletrónicos e equipamentos perto de ti. A Usit liga quem precisa de usar a quem tem objetos parados.</p></div><div class="hero-panel"><strong>${state.items.filter(i=>i.status==='Ativo').length}</strong><span>itens disponíveis agora</span></div></div>
     <div class="search-panel">
       <div class="search-row"><input class="input" id="searchText" placeholder="Procurar equipamentos..."><select id="categoryFilter"><option value="">Todas as categorias</option>${categories.map(c=>`<option>${c.id}</option>`).join('')}</select><select id="sortFilter"><option value="near">Mais perto</option><option value="price">Preço mais baixo</option><option value="views">Mais vistos</option></select></div>
-      <div class="cat-row"><button class="cat-btn active" data-cat=""><span>✨</span><span>Todas</span></button>${categories.map(c=>`<button class="cat-btn" data-cat="${c.id}"><span>${c.icon}</span><span>${c.id}</span></button>`).join('')}</div>
+      <div class="cat-row"><button class="cat-btn active" data-cat=""><span><i class="fa-solid fa-list"></i></span><span>Todas</span></button>${categories.map(c=>`<button class="cat-btn" data-cat="${c.id}"><span>${c.icon}</span><span>${c.id}</span></button>`).join('')}</div>
     </div>
     <div class="section-title"><h2>Perto de si</h2><span class="muted" id="resultCount"></span></div>
     <div class="item-list" id="itemsList"></div>
