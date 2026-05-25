@@ -169,13 +169,13 @@ function layout(content, active='explore'){
 }
 function navItems(role){
   if(role==='admin') return [
-    {id:'admin', label:'Dashboard', icon:'📊'}, {id:'admin-users', label:'Utilizadores', icon:'👥'}, {id:'admin-risk', label:'Risco', icon:'🛡️'}
+        {id:'admin', label:'Dashboard', icon:'<i class="fa-solid fa-chart-column"></i>'}, {id:'admin-users', label:'Utilizadores', icon:'<i class="fa-solid fa-users"></i>'}, {id:'admin-risk', label:'Risco', icon:'<i class="fa-solid fa-user-shield"></i>'}
   ];
   if(role==='partner') return [
-    {id:'partner', label:'Dashboard', icon:'📊'}, {id:'partner-items', label:'Itens', icon:'📦'}, {id:'partner-billing', label:'Faturação', icon:'🧾'}
+        {id:'partner', label:'Dashboard', icon:'<i class="fa-solid fa-chart-column"></i>'}, {id:'partner-items', label:'Itens', icon:'<i class="fa-solid fa-cubes"></i>'}, {id:'partner-billing', label:'Faturação', icon:'<i class="fa-solid fa-receipt"></i>'}
   ];
   return [
-    {id:'explore', label:'Explorar', icon:'🏠'}, {id:'items', label:'Os meus itens', icon:'📦'}, {id:'messages', label:'Mensagens', icon:'💬'}, {id:'reservations', label:'Reservas', icon:'📅'}, {id:'profile', label:'Perfil', icon:'👤'}
+        {id:'explore', label:'Explorar', icon:'<i class="fa-solid fa-magnifying-glass"></i>'}, {id:'items', label:'Os meus itens', icon:'<i class="fa-solid fa-cubes"></i>'}, {id:'messages', label:'Mensagens', icon:'<i class="fa-regular fa-comment-dots"></i>'}, {id:'reservations', label:'Reservas', icon:'<i class="fa-regular fa-calendar-days"></i>'}, {id:'profile', label:'Perfil', icon:'<i class="fa-solid fa-user"></i>'}
   ];
 }
 function roleLabel(role){ return role==='admin'?'Administrador':role==='partner'?'Parceiro comercial':'Utilizador comum'; }
