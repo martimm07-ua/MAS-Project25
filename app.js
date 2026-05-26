@@ -108,11 +108,13 @@ function renderLogin(createMode=false){
   app.innerHTML = `
     <main class="login-page">
       <section class="login-card">
-        <div class="brand"><div><img src="logo-usit.png" width = 150></div></div>
+      <div class="login-header">
+        <img src="logo-usit.png" width="52" alt="Usit">
         <div class="login-title">
           <h1>${createMode ? 'Criar conta' : 'Bem-vindo à Usit'}</h1>
           <p>use it. share it.</p>
         </div>
+      </div>
         <form class="login-form" id="authForm">
           ${createMode ? `<div><label>Nome</label><input class="input" id="name" placeholder="O teu nome" required></div>` : ''}
           <div><label>Email</label><input class="input" id="email" type="email" placeholder="seu@email.com" required></div>
