@@ -109,7 +109,6 @@ function renderLogin(createMode=false){
     <main class="login-page">
       <section class="login-card">
       <div class="login-title">
-        <img src="logo-usit.png" width="120" style="margin:0 auto 1rem;display:block">
         <h1>${createMode ? 'Criar conta' : 'Bem-vindo à Usit'}</h1>
         <p>use it. share it.</p>
      </div>
