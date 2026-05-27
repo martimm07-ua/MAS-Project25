@@ -225,7 +225,7 @@ function viewExplore(){
   return `
     <div class="hero"><div><h2>Encontra o que precisas sem comprar.</h2><p>Pesquisa ferramentas, eletrónicos e equipamentos perto de ti. A Usit liga quem precisa de usar a quem tem objetos parados.</p></div><div class="hero-panel"><strong>${state.items.filter(i=>i.status==='Ativo').length}</strong><span>itens disponíveis agora</span></div></div>
     <div class="search-panel">
-      <div class="search-row"><input class="input" id="searchText" placeholder="Procurar equipamentos..."><select id="categoryFilter"><option value="">Todas as categorias</option>${categories.map(c=>`<option>${c.id}</option>`).join('')}</select><select id="sortFilter"><option value="near">Mais perto</option><option value="price">Preço mais baixo</option><option value="views">Mais vistos</option></select></div>
+      <div class="search-row"><input class="input" id="searchText" placeholder="Procurar equipamentos..."><select id="sortFilter"><option value="near">Mais perto</option><option value="price">Preço mais baixo</option><option value="views">Mais vistos</option></select></div>
       <div class="cat-row"><button class="cat-btn active" data-cat=""><span><i class="fa-solid fa-list"></i></span><span>Todas</span></button>${categories.map(c=>`<button class="cat-btn" data-cat="${c.id}"><span>${c.icon}</span><span>${c.id}</span></button>`).join('')}</div>
     </div>
     <div class="section-title"><h2>Perto de si</h2><span class="muted" id="resultCount"></span></div>
