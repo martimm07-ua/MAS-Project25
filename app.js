@@ -253,10 +253,11 @@ function viewDetail(){
   const i = state.items.find(x=>x.id===state.selectedItemId) || state.items[0];
   state.selectedItemId = i.id;
   const min = new Date().toISOString().slice(0,10);
+  const isOwnItem = i.ownerId === user()?.id;
   return `
     <button class="btn ghost" data-view="explore">← Voltar</button>
     <div class="detail-layout">
-      <div class="card"><div class="big-visual">${itemMedia(i)}</div><h2>${i.title}</h2><p>${i.description}</p><div class="status-line"><span class="badge">${i.category}</span><span class="badge ${i.verified?'success':'gray'}">${i.verified?'Verificado':'Por verificar'}</span><span class="badge ${i.status==='Ativo'?'success':'warn'}">${i.status}</span></div><div class="section-title"><h2>Condições</h2></div><p>${i.conditions}</p><p class="muted">Proprietário: ${i.ownerName} · ${i.location}</p></div>
+      <div class="card"><div class="big-visual">${itemMedia(i)}</div><h2>${i.title}</h2><p>${i.description}</p><div class="status-line"><span class="badge">${i.category}</span><span class="badge ${i.verified?'success':'gray'}">${i.verified?'Verificado':'Por verificar'}</span><span class="badge ${i.status==='Ativo'?'success':'warn'}">${i.status}</span></div><div class="section-title"><h2>Condições</h2></div><p>${i.conditions}</p><p class="muted">Proprietário: ${i.ownerName} · ${i.location}</p><div class="status-line"><button class="btn ghost" data-chat-owner="${i.ownerId}" ${isOwnItem?'disabled':''}><i class="fa-regular fa-comment-dots"></i> Falar com proprietário</button></div></div>
       <aside class="card"><h3>Solicitar aluguer</h3><div class="summary-box"><div class="summary-row"><span>Preço diário</span><strong>${money(i.price)}</strong></div><div class="summary-row"><span>Caução</span><strong>${money(i.deposit)}</strong></div><div class="summary-row"><span>Comissão Usit</span><strong>2%</strong></div></div><form id="requestForm" class="login-form"><div><label>Data de início</label><input class="input" type="date" id="startDate" min="${min}" required></div><div><label>Data de fim</label><input class="input" type="date" id="endDate" min="${min}" required></div><div class="summary-box" id="costBox"><div class="summary-row"><span>Total estimado</span><strong>Seleciona datas</strong></div></div><button class="btn primary full" ${i.status!=='Ativo'?'disabled':''}>Confirmar pedido</button></form></aside>
     </div>
   `;
@@ -282,10 +283,11 @@ function reservationCard(r){
 }
 
 function viewAddItem(){
-  const draft = state.draftItem || {};
+  const editingItem = state.editItemId ? state.items.find(i => i.id === state.editItemId && i.ownerId === user()?.id) : null;
+  const draft = editingItem || state.draftItem || {};
   return `
-    <button class="btn ghost" data-view="items">← Voltar</button>
-    <div class="card wizard"><div class="section-title"><h2>Adicionar item</h2><button class="btn ghost" id="saveDraft">Guardar rascunho</button></div><div class="progress"><span style="width:100%"></span></div><div class="steps"><span>1. Dados</span><span>2. Condições</span><span>3. Publicar</span></div><form id="itemForm" class="login-form"><div class="form-grid"><div class="field"><label>Nome do equipamento</label><input class="input" id="itemTitle" value="${draft.title||''}" placeholder="Ex: Berbequim Elétrico Bosch" required></div><div class="field"><label>Categoria</label><select id="itemCategory" required><option value="">Selecionar categoria</option>${categories.map(c=>`<option ${draft.category===c.id?'selected':''}>${c.id}</option>`).join('')}</select></div></div><div><label>Fotografias</label><div class="upload-box">Carregar fotografia, simulado no protótipo</div></div><div><label>Descrição</label><textarea id="itemDesc" required placeholder="Descreve o estado e características do equipamento">${draft.description||''}</textarea></div><div class="form-grid"><div><label>Preço por dia</label><input class="input" id="itemPrice" type="number" min="1" value="${draft.price||''}" required></div><div><label>Caução</label><input class="input" id="itemDeposit" type="number" min="0" value="${draft.deposit||''}" required></div></div><div><label>Condições</label><textarea id="itemConditions" required>${draft.conditions||''}</textarea></div><button class="btn primary full">Publicar anúncio</button></form></div>
+    <button class="btn ghost" data-cancel-edit>← Voltar</button>
+    <div class="card wizard"><div class="section-title"><h2>${editingItem ? 'Editar item' : 'Adicionar item'}</h2><button class="btn ghost" id="saveDraft">${editingItem ? 'Cancelar edição' : 'Guardar rascunho'}</button></div><div class="progress"><span style="width:100%"></span></div><div class="steps"><span>1. Dados</span><span>2. Condições</span><span>3. Publicar</span></div><form id="itemForm" class="login-form"><div class="form-grid"><div class="field"><label>Nome do equipamento</label><input class="input" id="itemTitle" value="${draft.title||''}" placeholder="Ex: Berbequim Elétrico Bosch" required></div><div class="field"><label>Categoria</label><select id="itemCategory" required><option value="">Selecionar categoria</option>${categories.map(c=>`<option ${draft.category===c.id?'selected':''}>${c.id}</option>`).join('')}</select></div></div><div><label>Fotografias</label><div class="upload-box">Carregar fotografia, simulado no protótipo</div></div><div><label>Descrição</label><textarea id="itemDesc" required placeholder="Descreve o estado e características do equipamento">${draft.description||''}</textarea></div><div class="form-grid"><div><label>Preço por dia</label><input class="input" id="itemPrice" type="number" min="1" value="${draft.price||''}" required></div><div><label>Caução</label><input class="input" id="itemDeposit" type="number" min="0" value="${draft.deposit||''}" required></div></div><div><label>Condições</label><textarea id="itemConditions" required>${draft.conditions||''}</textarea></div><button class="btn primary full">${editingItem ? 'Guardar alterações' : 'Publicar anúncio'}</button></form></div>
   `;
 }
 
@@ -296,7 +298,7 @@ function viewReservations(){
 }
 function viewMessages(){
   const u = user();
-  const peers = state.users.filter(x => x.id!==u.id && x.role==='user');
+  const peers = state.users.filter(x => x.id!==u.id && (x.role==='user' || x.role==='partner'));
   const selected = state.selectedThreadUserId && peers.find(p=>p.id===state.selectedThreadUserId) ? state.selectedThreadUserId : peers[0]?.id;
   state.selectedThreadUserId = selected;
   const msgs = state.messages.filter(m => (m.from===u.id && m.to===selected) || (m.from===selected && m.to===u.id));
@@ -313,21 +315,49 @@ function viewProfile(){
 }
 
 function bindUserView(){
-  if($('#searchText')){ renderItemsList(); $('#searchText').oninput=renderItemsList; $('#categoryFilter').onchange=renderItemsList; $('#sortFilter').onchange=renderItemsList; document.querySelectorAll('.cat-btn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); $('#categoryFilter').value=b.dataset.cat; renderItemsList();}); }
-  document.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>{state.selectedItemId=b.dataset.detail; state.items.find(i=>i.id===b.dataset.detail).views++; state.activeView='detail'; save(); render();});
+  if($('#searchText')){
+    renderItemsList();
+    $('#searchText').oninput = renderItemsList;
+    $('#sortFilter').onchange = renderItemsList;
+    document.querySelectorAll('.cat-btn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderItemsList();});
+  }
+  document.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>{state.selectedItemId=b.dataset.detail; const item = state.items.find(i=>i.id===b.dataset.detail); if(item) item.views++; state.activeView='detail'; save(); render();});
+  document.querySelectorAll('[data-chat-owner]').forEach(b=>b.onclick=()=>openChatWithUser(b.dataset.chatOwner));
   const rf=$('#requestForm'); if(rf){ const update=()=>{ const item=state.items.find(i=>i.id===state.selectedItemId); const days=calcDays($('#startDate').value,$('#endDate').value); $('#costBox').innerHTML = days ? `<div class="summary-row"><span>${days} dia(s)</span><strong>${money(calcTotal(item,days))}</strong></div><div class="tiny">Inclui caução e comissão.</div>` : `<div class="summary-row"><span>Total estimado</span><strong>Seleciona datas</strong></div>`;}; $('#startDate').onchange=update; $('#endDate').onchange=update; rf.onsubmit=(e)=>{e.preventDefault(); const item=state.items.find(i=>i.id===state.selectedItemId); const days=calcDays($('#startDate').value,$('#endDate').value); if(!days){toast('Escolhe datas válidas.'); return;} const r={id:uid('r'), itemId:item.id, itemTitle:item.title, ownerId:item.ownerId, locatarioId:user().id, start:$('#startDate').value, end:$('#endDate').value, days, total:calcTotal(item,days), state:'Pendente', paid:false, received:false, createdAt:new Date().toISOString().slice(0,10)}; state.reservations.push(r); save(); toast('Pedido enviado ao proprietário.'); setView('reservations');}; }
   document.querySelectorAll('[data-accept]').forEach(b=>b.onclick=()=>{const r=state.reservations.find(x=>x.id===b.dataset.accept); r.state='Confirmada'; const item=state.items.find(i=>i.id===r.itemId); if(item) item.status='Alugado'; save(); toast('Pedido aceite.'); render();});
   document.querySelectorAll('[data-reject]').forEach(b=>b.onclick=()=>{const r=state.reservations.find(x=>x.id===b.dataset.reject); r.state='Recusada'; save(); toast('Pedido recusado.'); render();});
   document.querySelectorAll('[data-pay]').forEach(b=>b.onclick=()=>{const u=user(); if(!u.paymentMethod){toast('Adiciona um método de pagamento no perfil.'); setView('profile'); return;} const r=state.reservations.find(x=>x.id===b.dataset.pay); r.paid=true; r.state='Confirmada'; save(); toast('Pagamento registado.'); render();});
   document.querySelectorAll('[data-received]').forEach(b=>b.onclick=()=>{const r=state.reservations.find(x=>x.id===b.dataset.received); r.received=true; r.state='Concluída'; save(); toast('Receção confirmada.'); render();});
-  document.querySelectorAll('[data-open-chat]').forEach(b=>b.onclick=()=>{state.selectedThreadUserId=b.dataset.openChat; state.activeView='messages'; save(); render();});
+  document.querySelectorAll('[data-open-chat]').forEach(b=>b.onclick=()=>openChatWithUser(b.dataset.openChat));
   document.querySelectorAll('[data-toggle-status]').forEach(b=>b.onclick=()=>{const it=state.items.find(i=>i.id===b.dataset.toggleStatus); it.status = it.status==='Ativo' ? 'Não disponível' : 'Ativo'; save(); render();});
-  const itemForm=$('#itemForm'); if(itemForm){ $('#saveDraft').onclick=()=>{state.draftItem = readItemForm(); save(); toast('Rascunho guardado.');}; itemForm.onsubmit=(e)=>{e.preventDefault(); const data=readItemForm(); if(!data.title || !data.category || !data.description || data.price<=0){ toast('Preenche os dados obrigatórios.'); return; } state.items.push({id:uid('i'), ownerId:user().id, ownerName:user().name, title:data.title, category:data.category, description:data.description, location:user().location||'Lisboa, Portugal', distance:0.5, price:data.price, deposit:data.deposit, status:'Ativo', verified:false, emoji:iconFor(data.category), views:0, partner:false, conditions:data.conditions, available:[]}); state.draftItem=null; save(); toast('Anúncio publicado.'); setView('items');}; }
+  document.querySelectorAll('[data-edit-item]').forEach(b=>b.onclick=()=>startEditItem(b.dataset.editItem));
+  document.querySelectorAll('[data-cancel-edit]').forEach(b=>b.onclick=()=>{state.editItemId=null; save(); setView('items');});
+  const itemForm=$('#itemForm'); if(itemForm){ $('#saveDraft').onclick=()=>{ if(state.editItemId){ state.editItemId=null; save(); setView('items'); return; } state.draftItem = readItemForm(); save(); toast('Rascunho guardado.');}; itemForm.onsubmit=(e)=>{e.preventDefault(); const data=readItemForm(); if(!data.title || !data.category || !data.description || data.price<=0){ toast('Preenche os dados obrigatórios.'); return; } if(state.editItemId){ const item = state.items.find(i=>i.id===state.editItemId && i.ownerId===user().id); if(!item){ toast('Não foi possível editar este item.'); state.editItemId=null; save(); setView('items'); return; } Object.assign(item,{title:data.title, category:data.category, description:data.description, price:data.price, deposit:data.deposit, conditions:data.conditions, emoji:iconFor(data.category)}); state.editItemId=null; save(); toast('Alterações guardadas.'); setView('items'); return; } state.items.push({id:uid('i'), ownerId:user().id, ownerName:user().name, title:data.title, category:data.category, description:data.description, location:user().location||'Lisboa, Portugal', distance:0.5, price:data.price, deposit:data.deposit, status:'Ativo', verified:false, emoji:iconFor(data.category), views:0, partner:false, conditions:data.conditions, available:[]}); state.draftItem=null; save(); toast('Anúncio publicado.'); setView('items');}; }
   const pf=$('#profileForm'); if(pf){ pf.onsubmit=(e)=>{e.preventDefault(); const u=user(); u.name=$('#profileName').value; u.email=$('#profileEmail').value; u.location=$('#profileLocation').value; save(); toast('Perfil guardado.'); render();}; }
   const payf=$('#paymentForm'); if(payf){ payf.onsubmit=(e)=>{e.preventDefault(); const u=user(); u.paymentMethod=$('#paymentMethod').value; u.payoutMethod=$('#payoutMethod').value; save(); toast('Métodos guardados.'); render();}; }
   document.querySelectorAll('[data-thread]').forEach(b=>b.onclick=()=>{state.selectedThreadUserId=b.dataset.thread; save(); render();});
   const sf=$('#sendForm'); if(sf){ sf.onsubmit=(e)=>{e.preventDefault(); const txt=$('#msgText').value.trim(); if(!txt) return; state.messages.push({id:uid('m'), from:user().id, to:state.selectedThreadUserId, text:txt, date:new Date().toLocaleString('pt-PT',{dateStyle:'short',timeStyle:'short'})}); save(); render();}; }
 }
+
+function openChatWithUser(userId){
+  if(!userId){ toast('Não foi possível abrir a conversa.'); return; }
+  if(userId === user()?.id){ toast('Não podes abrir conversa contigo próprio.'); return; }
+  state.selectedThreadUserId = userId;
+  state.activeView = 'messages';
+  save();
+  render();
+}
+
+function startEditItem(itemId){
+  const item = state.items.find(i => i.id === itemId && i.ownerId === user()?.id);
+  if(!item){ toast('Não foi possível editar este item.'); return; }
+  state.editItemId = itemId;
+  state.draftItem = null;
+  state.activeView = 'add';
+  save();
+  render();
+}
+
 function readItemForm(){return { title:$('#itemTitle').value.trim(), category:$('#itemCategory').value, description:$('#itemDesc').value.trim(), price:Number($('#itemPrice').value||0), deposit:Number($('#itemDeposit').value||0), conditions:$('#itemConditions').value.trim()};}
 function iconFor(cat){ return categories.find(c=>c.id===cat)?.icon || '📦'; }
 
