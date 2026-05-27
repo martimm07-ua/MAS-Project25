@@ -198,7 +198,7 @@ function navItems(role){
 }
 function roleLabel(role){ return role==='admin'?'Administrador':role==='partner'?'Parceiro comercial':'Utilizador comum'; }
 function pageTitle(view){
-  const map = {explore:'Explorar', items:'Os meus itens', messages:'Mensagens', reservations:'Reservas', profile:'Perfil', admin:'Dashboard administrador', 'admin-users':'Gestão e dados agregados', 'admin-risk':'Privacidade e acesso', partner:'Dashboard parceiro', 'partner-items':'Itens do parceiro', 'partner-billing':'Faturação', detail:'Detalhe do item', add:'Adicionar item'};
+  const map = {explore:'Explorar', items:'Os meus itens', messages:'Mensagens', reservations:'Reservas', profile:'Perfil', admin:'Dashboard administrador', 'admin-users':'Gestão e dados agregados', 'admin-risk':'Privacidade e acesso', partner:'Dashboard parceiro', 'partner-items':'Itens do parceiro', 'partner-billing':'Faturação', detail:'Detalhe do item', add:'Adicionar item', payment:'Pagamento'};
   return map[view] || 'Usit';
 }
 function bindShell(){
@@ -215,8 +215,9 @@ function renderUserApp(){
   else if(v==='profile') body = viewProfile();
   else if(v==='detail') body = viewDetail();
   else if(v==='add') body = viewAddItem();
+  else if(v==='payment') body = viewPayment();
   else body = viewExplore();
-  app.innerHTML = layout(body, v === 'detail' ? 'explore' : v === 'add' ? 'items' : v);
+  app.innerHTML = layout(body, v === 'detail' ? 'explore' : v === 'add' ? 'items' : v === 'payment' ? 'reservations' : v);
   bindShell();
   bindUserView();
 }
@@ -296,6 +297,58 @@ function viewReservations(){
   const mine = state.reservations.filter(r=>r.locatarioId===u.id || r.ownerId===u.id);
   return `<div class="section-title"><h2>Reservas</h2></div><div class="item-list">${mine.map(reservationCard).join('') || `<div class="card"><p>Ainda não tens reservas.</p></div>`}</div>`;
 }
+
+function viewPayment(){
+  const u = user();
+  const r = state.reservations.find(x => x.id === state.selectedPaymentReservationId && x.locatarioId === u.id);
+  if(!r){
+    return `
+      <button class="btn ghost" data-view="reservations">← Voltar</button>
+      <div class="card"><h3>Pagamento indisponível</h3><p class="muted">Não foi possível encontrar a reserva selecionada.</p></div>
+    `;
+  }
+  const item = state.items.find(i => i.id === r.itemId);
+  const owner = state.users.find(x => x.id === r.ownerId);
+  const base = item ? item.price * r.days : Math.max(0, r.total);
+  const deposit = item ? item.deposit : 0;
+  const commission = item ? base * 0.02 : 0;
+  const canPay = r.state === 'Confirmada' && !r.paid;
+  return `
+    <button class="btn ghost" data-view="reservations">← Voltar às reservas</button>
+    <div class="grid two">
+      <div class="card">
+        <h3>Resumo do aluguer</h3>
+        <div class="summary-box">
+          <div class="summary-row"><span>Item</span><strong>${r.itemTitle}</strong></div>
+          <div class="summary-row"><span>Proprietário</span><strong>${owner?.name || 'Utilizador'}</strong></div>
+          <div class="summary-row"><span>Período</span><strong>${r.start} a ${r.end}</strong></div>
+          <div class="summary-row"><span>Duração</span><strong>${r.days} dia(s)</strong></div>
+          <div class="summary-row"><span>Estado</span><strong>${r.state}</strong></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Efetuar pagamento</h3>
+        <div class="summary-box">
+          <div class="summary-row"><span>Preço do aluguer</span><strong>${money(base)}</strong></div>
+          <div class="summary-row"><span>Caução</span><strong>${money(deposit)}</strong></div>
+          <div class="summary-row"><span>Comissão Usit</span><strong>${money(commission)}</strong></div>
+          <div class="summary-row"><span>Total</span><strong>${money(r.total)}</strong></div>
+        </div>
+        ${u.paymentMethod ? `
+          <p class="muted">Método de pagamento: <strong>${u.paymentMethod}</strong></p>
+          <form id="paymentCheckoutForm" class="login-form">
+            <button class="btn primary full" ${canPay ? '' : 'disabled'}>Confirmar pagamento</button>
+          </form>
+          <button class="btn ghost full" data-payment-fail ${canPay ? '' : 'disabled'}>Simular pagamento recusado</button>
+        ` : `
+          <p class="muted">Para concluir o pagamento, adiciona primeiro um método de pagamento no perfil.</p>
+          <button class="btn primary full" data-view="profile">Adicionar método de pagamento</button>
+        `}
+      </div>
+    </div>
+  `;
+}
+
 function viewMessages(){
   const u = user();
   const peers = state.users.filter(x => x.id!==u.id && (x.role==='user' || x.role==='partner'));
@@ -326,7 +379,9 @@ function bindUserView(){
   const rf=$('#requestForm'); if(rf){ const update=()=>{ const item=state.items.find(i=>i.id===state.selectedItemId); const days=calcDays($('#startDate').value,$('#endDate').value); $('#costBox').innerHTML = days ? `<div class="summary-row"><span>${days} dia(s)</span><strong>${money(calcTotal(item,days))}</strong></div><div class="tiny">Inclui caução e comissão.</div>` : `<div class="summary-row"><span>Total estimado</span><strong>Seleciona datas</strong></div>`;}; $('#startDate').onchange=update; $('#endDate').onchange=update; rf.onsubmit=(e)=>{e.preventDefault(); const item=state.items.find(i=>i.id===state.selectedItemId); const days=calcDays($('#startDate').value,$('#endDate').value); if(!days){toast('Escolhe datas válidas.'); return;} const r={id:uid('r'), itemId:item.id, itemTitle:item.title, ownerId:item.ownerId, locatarioId:user().id, start:$('#startDate').value, end:$('#endDate').value, days, total:calcTotal(item,days), state:'Pendente', paid:false, received:false, createdAt:new Date().toISOString().slice(0,10)}; state.reservations.push(r); save(); toast('Pedido enviado ao proprietário.'); setView('reservations');}; }
   document.querySelectorAll('[data-accept]').forEach(b=>b.onclick=()=>{const r=state.reservations.find(x=>x.id===b.dataset.accept); r.state='Confirmada'; const item=state.items.find(i=>i.id===r.itemId); if(item) item.status='Alugado'; save(); toast('Pedido aceite.'); render();});
   document.querySelectorAll('[data-reject]').forEach(b=>b.onclick=()=>{const r=state.reservations.find(x=>x.id===b.dataset.reject); r.state='Recusada'; save(); toast('Pedido recusado.'); render();});
-  document.querySelectorAll('[data-pay]').forEach(b=>b.onclick=()=>{const u=user(); if(!u.paymentMethod){toast('Adiciona um método de pagamento no perfil.'); setView('profile'); return;} const r=state.reservations.find(x=>x.id===b.dataset.pay); r.paid=true; r.state='Confirmada'; save(); toast('Pagamento registado.'); render();});
+  document.querySelectorAll('[data-pay]').forEach(b=>b.onclick=()=>startPayment(b.dataset.pay));
+  const checkout=$('#paymentCheckoutForm'); if(checkout){ checkout.onsubmit=(e)=>{e.preventDefault(); completePayment();}; }
+  document.querySelectorAll('[data-payment-fail]').forEach(b=>b.onclick=()=>{toast('Pagamento recusado pelo serviço de pagamentos.'); setView('reservations');});
   document.querySelectorAll('[data-received]').forEach(b=>b.onclick=()=>{const r=state.reservations.find(x=>x.id===b.dataset.received); r.received=true; r.state='Concluída'; save(); toast('Receção confirmada.'); render();});
   document.querySelectorAll('[data-open-chat]').forEach(b=>b.onclick=()=>openChatWithUser(b.dataset.openChat));
   document.querySelectorAll('[data-toggle-status]').forEach(b=>b.onclick=()=>{const it=state.items.find(i=>i.id===b.dataset.toggleStatus); it.status = it.status==='Ativo' ? 'Não disponível' : 'Ativo'; save(); render();});
@@ -337,6 +392,34 @@ function bindUserView(){
   const payf=$('#paymentForm'); if(payf){ payf.onsubmit=(e)=>{e.preventDefault(); const u=user(); u.paymentMethod=$('#paymentMethod').value; u.payoutMethod=$('#payoutMethod').value; save(); toast('Métodos guardados.'); render();}; }
   document.querySelectorAll('[data-thread]').forEach(b=>b.onclick=()=>{state.selectedThreadUserId=b.dataset.thread; save(); render();});
   const sf=$('#sendForm'); if(sf){ sf.onsubmit=(e)=>{e.preventDefault(); const txt=$('#msgText').value.trim(); if(!txt) return; state.messages.push({id:uid('m'), from:user().id, to:state.selectedThreadUserId, text:txt, date:new Date().toLocaleString('pt-PT',{dateStyle:'short',timeStyle:'short'})}); save(); render();}; }
+}
+
+
+function startPayment(reservationId){
+  const r = state.reservations.find(x => x.id === reservationId && x.locatarioId === user()?.id);
+  if(!r){ toast('Não foi possível abrir o pagamento.'); return; }
+  if(r.paid){ toast('Esta reserva já está paga.'); setView('reservations'); return; }
+  if(r.state !== 'Confirmada'){ toast('O pagamento só fica disponível após aceitação do proprietário.'); setView('reservations'); return; }
+  if(!user().paymentMethod){ toast('Adiciona um método de pagamento no perfil.'); setView('profile'); return; }
+  state.selectedPaymentReservationId = reservationId;
+  state.activeView = 'payment';
+  save();
+  render();
+}
+
+function completePayment(){
+  const r = state.reservations.find(x => x.id === state.selectedPaymentReservationId && x.locatarioId === user()?.id);
+  if(!r){ toast('Não foi possível concluir o pagamento.'); setView('reservations'); return; }
+  if(r.paid){ toast('Esta reserva já está paga.'); setView('reservations'); return; }
+  r.paid = true;
+  r.state = 'Confirmada';
+  r.paymentMethod = user().paymentMethod;
+  r.paymentDate = new Date().toISOString().slice(0,10);
+  const item = state.items.find(i => i.id === r.itemId);
+  if(item) item.status = 'Alugado';
+  save();
+  toast('Pagamento registado. Reserva confirmada.');
+  setView('reservations');
 }
 
 function openChatWithUser(userId){
