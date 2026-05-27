@@ -186,10 +186,13 @@ function layout(content, active='explore'){
 }
 function navItems(role){
   if(role==='admin') return [
-    {id:'admin', label:'Dashboard', icon:'<i class="fa-solid fa-chart-column"></i>'}, {id:'admin-users', label:'Utilizadores', icon:'<i class="fa-solid fa-users"></i>'}, {id:'admin-risk', label:'Risco', icon:'<i class="fa-solid fa-user-shield"></i>'}
+    {id:'admin', label:'Dashboard', icon:'<i class="fa-solid fa-chart-column"></i>'},
+    {id:'admin-users', label:'Utilizadores', icon:'<i class="fa-solid fa-users"></i>'}
   ];
   if(role==='partner') return [
-    {id:'partner', label:'Dashboard', icon:'<i class="fa-solid fa-chart-column"></i>'}, {id:'partner-items', label:'Itens', icon:'<i class="fa-solid fa-cubes"></i>'}, {id:'partner-billing', label:'Faturação', icon:'<i class="fa-solid fa-receipt"></i>'}
+    {id:'partner', label:'Dashboard', icon:'<i class="fa-solid fa-chart-column"></i>'},
+    {id:'partner-items', label:'Itens', icon:'<i class="fa-solid fa-cubes"></i>'},
+    {id:'partner-billing', label:'Faturação', icon:'<i class="fa-solid fa-receipt"></i>'}
 
   ];
   return [
@@ -198,7 +201,7 @@ function navItems(role){
 }
 function roleLabel(role){ return role==='admin'?'Administrador':role==='partner'?'Parceiro comercial':'Utilizador comum'; }
 function pageTitle(view){
-  const map = {explore:'Explorar', items:'Os meus itens', messages:'Mensagens', reservations:'Reservas', profile:'Perfil', admin:'Dashboard administrador', 'admin-users':'Gestão e dados agregados', 'admin-risk':'Privacidade e acesso', partner:'Dashboard parceiro', 'partner-items':'Itens do parceiro', 'partner-billing':'Faturação', detail:'Detalhe do item', add:'Adicionar item', payment:'Pagamento'};
+  const map = {explore:'Explorar', items:'Os meus itens', messages:'Mensagens', reservations:'Reservas', profile:'Perfil', admin:'Dashboard administrador', 'admin-users':'Gestão e dados agregados', partner:'Dashboard parceiro', 'partner-items':'Itens do parceiro', 'partner-billing':'Faturação', 'partner-add':'Adicionar item', detail:'Detalhe do item', add:'Adicionar item', payment:'Pagamento'};
   return map[view] || 'Usit';
 }
 function bindShell(){
@@ -386,8 +389,8 @@ function bindUserView(){
   document.querySelectorAll('[data-open-chat]').forEach(b=>b.onclick=()=>openChatWithUser(b.dataset.openChat));
   document.querySelectorAll('[data-toggle-status]').forEach(b=>b.onclick=()=>{const it=state.items.find(i=>i.id===b.dataset.toggleStatus); it.status = it.status==='Ativo' ? 'Não disponível' : 'Ativo'; save(); render();});
   document.querySelectorAll('[data-edit-item]').forEach(b=>b.onclick=()=>startEditItem(b.dataset.editItem));
-  document.querySelectorAll('[data-cancel-edit]').forEach(b=>b.onclick=()=>{state.editItemId=null; save(); setView('items');});
-  const itemForm=$('#itemForm'); if(itemForm){ $('#saveDraft').onclick=()=>{ if(state.editItemId){ state.editItemId=null; save(); setView('items'); return; } state.draftItem = readItemForm(); save(); toast('Rascunho guardado.');}; itemForm.onsubmit=(e)=>{e.preventDefault(); const data=readItemForm(); if(!data.title || !data.category || !data.description || data.price<=0){ toast('Preenche os dados obrigatórios.'); return; } if(state.editItemId){ const item = state.items.find(i=>i.id===state.editItemId && i.ownerId===user().id); if(!item){ toast('Não foi possível editar este item.'); state.editItemId=null; save(); setView('items'); return; } Object.assign(item,{title:data.title, category:data.category, description:data.description, price:data.price, deposit:data.deposit, conditions:data.conditions, emoji:iconFor(data.category)}); state.editItemId=null; save(); toast('Alterações guardadas.'); setView('items'); return; } state.items.push({id:uid('i'), ownerId:user().id, ownerName:user().name, title:data.title, category:data.category, description:data.description, location:user().location||'Lisboa, Portugal', distance:0.5, price:data.price, deposit:data.deposit, status:'Ativo', verified:false, emoji:iconFor(data.category), views:0, partner:false, conditions:data.conditions, available:[]}); state.draftItem=null; save(); toast('Anúncio publicado.'); setView('items');}; }
+  document.querySelectorAll('[data-cancel-edit]').forEach(b=>b.onclick=()=>{state.editItemId=null; save(); setView(user()?.role === 'partner' ? 'partner-items' : 'items');});
+  const itemForm=$('#itemForm'); if(itemForm){ $('#saveDraft').onclick=()=>{ if(state.editItemId){ state.editItemId=null; save(); setView(user()?.role === 'partner' ? 'partner-items' : 'items'); return; } state.draftItem = readItemForm(); save(); toast('Rascunho guardado.');}; itemForm.onsubmit=(e)=>{e.preventDefault(); const data=readItemForm(); if(!data.title || !data.category || !data.description || data.price<=0){ toast('Preenche os dados obrigatórios.'); return; } if(state.editItemId){ const item = state.items.find(i=>i.id===state.editItemId && i.ownerId===user().id); if(!item){ toast('Não foi possível editar este item.'); state.editItemId=null; save(); setView('items'); return; } Object.assign(item,{title:data.title, category:data.category, description:data.description, price:data.price, deposit:data.deposit, conditions:data.conditions, emoji:iconFor(data.category)}); state.editItemId=null; save(); toast('Alterações guardadas.'); setView(user()?.role === 'partner' ? 'partner-items' : 'items'); return; } state.items.push({id:uid('i'), ownerId:user().id, ownerName:user().company || user().name, title:data.title, category:data.category, description:data.description, location:user().location||'Lisboa, Portugal', distance:0.5, price:data.price, deposit:data.deposit, status:'Ativo', verified:user().role === 'partner', emoji:iconFor(data.category), views:0, partner:user().role === 'partner', conditions:data.conditions, available:[]}); state.draftItem=null; save(); toast('Anúncio publicado.'); setView(user()?.role === 'partner' ? 'partner-items' : 'items');}; }
   const pf=$('#profileForm'); if(pf){ pf.onsubmit=(e)=>{e.preventDefault(); const u=user(); u.name=$('#profileName').value; u.email=$('#profileEmail').value; u.location=$('#profileLocation').value; save(); toast('Perfil guardado.'); render();}; }
   const payf=$('#paymentForm'); if(payf){ payf.onsubmit=(e)=>{e.preventDefault(); const u=user(); u.paymentMethod=$('#paymentMethod').value; u.payoutMethod=$('#payoutMethod').value; save(); toast('Métodos guardados.'); render();}; }
   document.querySelectorAll('[data-thread]').forEach(b=>b.onclick=()=>{state.selectedThreadUserId=b.dataset.thread; save(); render();});
@@ -436,7 +439,7 @@ function startEditItem(itemId){
   if(!item){ toast('Não foi possível editar este item.'); return; }
   state.editItemId = itemId;
   state.draftItem = null;
-  state.activeView = 'add';
+  state.activeView = user()?.role === 'partner' ? 'partner-add' : 'add';
   save();
   render();
 }
@@ -446,22 +449,74 @@ function iconFor(cat){ return categories.find(c=>c.id===cat)?.icon || '📦'; }
 
 function renderAdmin(){
   const v = state.activeView;
-  const totalPaid = state.reservations.filter(r=>r.paid).reduce((s,r)=>s+r.total,0);
-  const activeUsers = state.users.filter(u=>u.role==='user').length;
+  const users = state.users.filter(u=>u.role==='user');
+  const partners = state.users.filter(u=>u.role==='partner');
+  const paidReservations = state.reservations.filter(r=>r.paid);
+  const totalPaid = paidReservations.reduce((s,r)=>s+r.total,0);
+  const activeUsers = users.length;
   const revenue = totalPaid * 0.02;
+  const totalDeposit = paidReservations.reduce((s,r)=>{
+    const item = state.items.find(i=>i.id===r.itemId);
+    return s + ((item && item.deposit) || 0);
+  },0);
+  const totalViews = state.items.reduce((s,i)=>s+(i.views||0),0);
+  const owners = new Set(state.items.map(i=>i.ownerId)).size;
+  const avgReservation = state.reservations.length ? state.reservations.reduce((s,r)=>s+r.total,0) / state.reservations.length : 0;
   const byCat = categories.map(c=>({cat:c.id, value:state.items.filter(i=>i.category===c.id).reduce((s,i)=>s+i.views,0)}));
+  const byRevenue = categories.map(c=>({
+    cat:c.id,
+    value:state.reservations.filter(r=>{
+      const item = state.items.find(i=>i.id===r.itemId);
+      return r.paid && item && item.category===c.id;
+    }).reduce((s,r)=>s+r.total,0)
+  }));
+  const userRows = users.map(u=>{
+    const ownItems = state.items.filter(i=>i.ownerId===u.id).length;
+    const rentals = state.reservations.filter(r=>r.locatarioId===u.id).length;
+    const income = state.reservations.filter(r=>r.ownerId===u.id && r.paid).reduce((s,r)=>s+r.total,0);
+    const spending = state.reservations.filter(r=>r.locatarioId===u.id && r.paid).reduce((s,r)=>s+r.total,0);
+    return `<tr><td>${u.name}</td><td>${u.location || 'Sem localidade'}</td><td>${ownItems}</td><td>${rentals}</td><td>${money(income)}</td><td>${money(spending)}</td><td>${u.paymentMethod ? 'Sim' : 'Não'}</td></tr>`;
+  }).join('');
   let body = '';
-  if(v==='admin-users') body = `<div class="card"><h3>Dados agregados de utilizadores</h3><div class="table-wrap"><table class="table"><thead><tr><th>Indicador</th><th>Valor</th><th>Nota</th></tr></thead><tbody><tr><td>Utilizadores comuns</td><td>${activeUsers}</td><td>Sem detalhe individual no painel de parceiros.</td></tr><tr><td>Proprietários ativos</td><td>${new Set(state.items.map(i=>i.ownerId)).size}</td><td>Baseado em itens publicados.</td></tr><tr><td>Reservas totais</td><td>${state.reservations.length}</td><td>Inclui pendentes, confirmadas e concluídas.</td></tr></tbody></table></div></div>`;
-  else if(v==='admin-risk') body = `<div class="grid two"><div class="card"><h3>Controlo de acesso</h3><p>O acesso ao painel usa o mesmo formulário de login, sem botão público. A função do utilizador define a área apresentada.</p><span class="badge success">Acesso reservado</span></div><div class="card"><h3>Privacidade</h3><p>O painel de parceiros mostra dados agregados do próprio parceiro e não apresenta dados identificáveis de outros parceiros ou utilizadores.</p><span class="badge success">Dados agregados</span></div></div>`;
-  else body = `<div class="hero"><div><h2>Painel de controlo da Usit</h2><p>Visão global para acompanhar transações, utilizadores ativos e receita por categoria.</p></div><div class="hero-panel"><strong>${money(revenue)}</strong><span>receita estimada da comissão</span></div></div><div class="grid four"><div class="stat-card"><span>Transações</span><strong>${state.reservations.length}</strong></div><div class="stat-card"><span>Utilizadores ativos</span><strong>${activeUsers}</strong></div><div class="stat-card"><span>Receita total</span><strong>${money(revenue)}</strong></div><div class="stat-card"><span>Anúncios</span><strong>${state.items.length}</strong></div></div><div class="grid two"><div class="card"><h3>Interesse por categoria</h3><div class="chart">${barChart(byCat)}</div></div><div class="card"><h3>Estado das reservas</h3><div class="chart">${barChart(['Pendente','Confirmada','Concluída','Recusada'].map(s=>({cat:s,value:state.reservations.filter(r=>r.state===s).length})))}</div></div></div>`;
+  if(v==='admin-users') body = `
+    <div class="grid four">
+      <div class="stat-card"><span>Utilizadores comuns</span><strong>${activeUsers}</strong></div>
+      <div class="stat-card"><span>Parceiros</span><strong>${partners.length}</strong></div>
+      <div class="stat-card"><span>Proprietários ativos</span><strong>${owners}</strong></div>
+      <div class="stat-card"><span>Reservas totais</span><strong>${state.reservations.length}</strong></div>
+    </div>
+    <div class="grid two">
+      <div class="card"><h3>Resumo agregado</h3><div class="table-wrap"><table class="table"><thead><tr><th>Indicador</th><th>Valor</th><th>Nota</th></tr></thead><tbody><tr><td>Utilizadores comuns</td><td>${activeUsers}</td><td>Contas com acesso à aplicação.</td></tr><tr><td>Proprietários ativos</td><td>${owners}</td><td>Baseado em itens publicados.</td></tr><tr><td>Reservas pagas</td><td>${paidReservations.length}</td><td>Reservas com pagamento validado.</td></tr><tr><td>Visualizações totais</td><td>${totalViews}</td><td>Soma de visualizações dos anúncios.</td></tr></tbody></table></div></div>
+      <div class="card"><h3>Distribuição de reservas</h3><div class="chart">${barChart(['Pendente','Confirmada','Concluída','Recusada'].map(s=>({cat:s,value:state.reservations.filter(r=>r.state===s).length})))}</div></div>
+    </div>
+    <div class="card"><h3>Utilizadores da plataforma</h3><div class="table-wrap"><table class="table"><thead><tr><th>Nome</th><th>Localidade</th><th>Itens</th><th>Reservas</th><th>Ganhos</th><th>Pagamentos</th><th>Método pag.</th></tr></thead><tbody>${userRows || `<tr><td colspan="7">Sem utilizadores.</td></tr>`}</tbody></table></div></div>`;
+  else body = `
+    <div class="hero"><div><h2>Painel de controlo da Usit</h2><p>Visão global para acompanhar transações, utilizadores ativos, anúncios, pagamentos e receita por categoria.</p></div><div class="hero-panel"><strong>${money(revenue)}</strong><span>receita estimada da comissão</span></div></div>
+    <div class="grid four"><div class="stat-card"><span>Transações</span><strong>${state.reservations.length}</strong></div><div class="stat-card"><span>Utilizadores ativos</span><strong>${activeUsers}</strong></div><div class="stat-card"><span>Receita Usit</span><strong>${money(revenue)}</strong></div><div class="stat-card"><span>Anúncios</span><strong>${state.items.length}</strong></div></div>
+    <div class="grid four"><div class="stat-card"><span>Volume pago</span><strong>${money(totalPaid)}</strong></div><div class="stat-card"><span>Cauções associadas</span><strong>${money(totalDeposit)}</strong></div><div class="stat-card"><span>Visualizações</span><strong>${totalViews}</strong></div><div class="stat-card"><span>Valor médio</span><strong>${money(avgReservation)}</strong></div></div>
+    <div class="grid two"><div class="card"><h3>Interesse por categoria</h3><div class="chart">${barChart(byCat)}</div></div><div class="card"><h3>Receita por categoria</h3><div class="chart">${barChart(byRevenue)}</div></div></div>
+    <div class="grid two"><div class="card"><h3>Estado das reservas</h3><div class="chart">${barChart(['Pendente','Confirmada','Concluída','Recusada'].map(s=>({cat:s,value:state.reservations.filter(r=>r.state===s).length})))}</div></div><div class="card"><h3>Controlo de acesso e privacidade</h3><p>O acesso ao painel usa o mesmo formulário de login, sem botão público. A função do utilizador define a área apresentada.</p><p>Os dados de parceiros são agregados e separados por conta.</p><span class="badge success">Acesso reservado</span></div></div>`;
   app.innerHTML = layout(body, v.startsWith('admin')?v:'admin'); bindShell();
 }
 function renderPartner(){
-  const v=state.activeView; const u=user(); const items=state.items.filter(i=>i.ownerId===u.id); const res=state.reservations.filter(r=>r.ownerId===u.id); const paid=res.filter(r=>r.paid).reduce((s,r)=>s+r.total,0); let body='';
-  if(v==='partner-items') body = `<div class="section-title"><h2>Inventário do parceiro</h2></div><div class="grid two">${items.map(i=>`<div class="card"><div class="item-card" style="box-shadow:none;border:none;padding:0"><div class="item-img">${itemMedia(i)}</div><div class="item-info"><h3>${i.title}</h3><p>${i.views} visualizações</p><p class="price">${money(i.price)}/dia</p></div></div></div>`).join('') || `<div class="card"><p>Sem itens.</p></div>`}</div>`;
-  else if(v==='partner-billing') body = `<div class="card"><h3>Faturação e reservas</h3><div class="table-wrap"><table class="table"><thead><tr><th>Reserva</th><th>Estado</th><th>Valor</th><th>Pago</th></tr></thead><tbody>${res.map(r=>`<tr><td>${r.itemTitle}</td><td>${r.state}</td><td>${money(r.total)}</td><td>${r.paid?'Sim':'Não'}</td></tr>`).join('') || `<tr><td colspan="4">Sem reservas.</td></tr>`}</tbody></table></div></div>`;
-  else body = `<div class="hero"><div><h2>Área do parceiro</h2><p>Consulta desempenho dos anúncios, reservas e ganhos associados ao teu inventário.</p></div><div class="hero-panel"><strong>${money(paid)}</strong><span>volume associado ao parceiro</span></div></div><div class="grid four"><div class="stat-card"><span>Itens</span><strong>${items.length}</strong></div><div class="stat-card"><span>Visualizações</span><strong>${items.reduce((s,i)=>s+i.views,0)}</strong></div><div class="stat-card"><span>Reservas</span><strong>${res.length}</strong></div><div class="stat-card"><span>Valor pago</span><strong>${money(paid)}</strong></div></div><div class="card"><h3>Desempenho por item</h3><div class="chart">${barChart(items.map(i=>({cat:i.title,value:i.views})))}</div></div>`;
-  app.innerHTML = layout(body, v.startsWith('partner')?v:'partner'); bindShell();
+  const v=state.activeView; const u=user(); const items=state.items.filter(i=>i.ownerId===u.id); const res=state.reservations.filter(r=>r.ownerId===u.id); const paid=res.filter(r=>r.paid).reduce((s,r)=>s+r.total,0); const views=items.reduce((s,i)=>s+(i.views||0),0); const pending=res.filter(r=>r.state==='Pendente').length; const confirmed=res.filter(r=>r.state==='Confirmada').length; const completed=res.filter(r=>r.state==='Concluída').length; const unpaid=res.filter(r=>!r.paid).reduce((s,r)=>s+r.total,0); let body='';
+  if(v==='partner-add') body = viewAddItem();
+  else if(v==='partner-items') body = `
+    <div class="section-title"><h2>Inventário do parceiro</h2><button class="btn primary" data-view="partner-add">+ Adicionar item</button></div>
+    <div class="grid two">${items.map(i=>{
+      const itemRes = res.filter(r=>r.itemId===i.id);
+      return `<div class="card"><div class="item-card" style="box-shadow:none;border:none;padding:0"><div class="item-img">${itemMedia(i)}</div><div class="item-info"><h3>${i.title}</h3><p>${i.views} visualizações · ${itemRes.length} reserva(s)</p><p class="price">${money(i.price)}/dia</p><span class="badge ${i.status==='Ativo'?'success':i.status==='Alugado'?'warn':'gray'}">${i.status}</span></div></div><div class="status-line"><button class="btn ghost" data-toggle-status="${i.id}">Alternar estado</button><button class="btn ghost" data-edit-item="${i.id}">Editar</button></div></div>`;
+    }).join('') || `<div class="card"><h3>Sem itens publicados</h3><p>Adiciona o primeiro item para começar a acompanhar visualizações e reservas.</p></div>`}</div>`;
+  else if(v==='partner-billing') body = `
+    <div class="grid four"><div class="stat-card"><span>Valor pago</span><strong>${money(paid)}</strong></div><div class="stat-card"><span>Por receber</span><strong>${money(unpaid)}</strong></div><div class="stat-card"><span>Reservas</span><strong>${res.length}</strong></div><div class="stat-card"><span>Taxa de conversão</span><strong>${views ? Math.round((res.length/views)*100) : 0}%</strong></div></div>
+    <div class="card"><h3>Faturação e reservas</h3><div class="table-wrap"><table class="table"><thead><tr><th>Reserva</th><th>Datas</th><th>Estado</th><th>Valor</th><th>Pago</th><th>Locatário</th></tr></thead><tbody>${res.map(r=>`<tr><td>${r.itemTitle}</td><td>${r.start} a ${r.end}</td><td>${r.state}</td><td>${money(r.total)}</td><td>${r.paid?'Sim':'Não'}</td><td>Utilizador #${String(r.locatarioId).replace(/\D/g,'') || '1'}</td></tr>`).join('') || `<tr><td colspan="6">Sem reservas.</td></tr>`}</tbody></table></div></div>
+    <div class="grid two"><div class="card"><h3>Valor por item</h3><div class="chart">${barChart(items.map(i=>({cat:i.title,value:res.filter(r=>r.itemId===i.id && r.paid).reduce((s,r)=>s+r.total,0)})))}</div></div><div class="card"><h3>Estado das reservas</h3><div class="chart">${barChart(['Pendente','Confirmada','Concluída','Recusada'].map(s=>({cat:s,value:res.filter(r=>r.state===s).length})))}</div></div></div>`;
+  else body = `
+    <div class="hero"><div><h2>Área do parceiro</h2><p>Consulta desempenho dos anúncios, reservas, visualizações e ganhos associados ao teu inventário.</p></div><div class="hero-panel"><strong>${money(paid)}</strong><span>volume associado ao parceiro</span></div></div>
+    <div class="grid four"><div class="stat-card"><span>Itens</span><strong>${items.length}</strong></div><div class="stat-card"><span>Visualizações</span><strong>${views}</strong></div><div class="stat-card"><span>Reservas</span><strong>${res.length}</strong></div><div class="stat-card"><span>Valor pago</span><strong>${money(paid)}</strong></div></div>
+    <div class="grid four"><div class="stat-card"><span>Pendentes</span><strong>${pending}</strong></div><div class="stat-card"><span>Confirmadas</span><strong>${confirmed}</strong></div><div class="stat-card"><span>Concluídas</span><strong>${completed}</strong></div><div class="stat-card"><span>Por receber</span><strong>${money(unpaid)}</strong></div></div>
+    <div class="grid two"><div class="card"><h3>Desempenho por item</h3><div class="chart">${barChart(items.map(i=>({cat:i.title,value:i.views})))}</div></div><div class="card"><h3>Reservas por item</h3><div class="chart">${barChart(items.map(i=>({cat:i.title,value:res.filter(r=>r.itemId===i.id).length})))}</div></div></div>`;
+  app.innerHTML = layout(body, v==='partner-add' ? 'partner-items' : v.startsWith('partner')?v:'partner'); bindShell(); bindUserView();
 }
 function barChart(rows){ const max = Math.max(1,...rows.map(r=>r.value)); return rows.map(r=>`<div class="bar-row"><span class="tiny">${r.cat}</span><div class="bar"><span style="width:${Math.max(4,(r.value/max)*100)}%"></span></div><strong>${r.value}</strong></div>`).join(''); }
 
