@@ -248,6 +248,21 @@ function renderItemsList(){
   else items.sort((a,b)=>a.distance-b.distance);
   $('#resultCount').textContent = `${items.length} resultado${items.length===1?'':'s'}`;
   $('#itemsList').innerHTML = items.map(itemCard).join('') || `<div class="card"><h3>Sem resultados</h3><p>Altera a pesquisa ou escolhe outra categoria.</p></div>`;
+  bindDetailButtons();
+}
+function openItemDetail(itemId){
+  const item = state.items.find(i => i.id === itemId);
+  if(!item){ toast('Não foi possível abrir os detalhes do anúncio.'); return; }
+  state.selectedItemId = item.id;
+  item.views = Number(item.views || 0) + 1;
+  state.activeView = 'detail';
+  save();
+  render();
+}
+function bindDetailButtons(){
+  document.querySelectorAll('[data-detail]').forEach(b => {
+    b.onclick = () => openItemDetail(b.dataset.detail);
+  });
 }
 function itemCard(i){
   return `<article class="item-card"><div class="item-img">${itemMedia(i)}</div><div class="item-info"><h3>${i.title}</h3><p>📍 ${i.location} · ${i.distance} km</p><p class="price">${money(i.price)}/dia</p><div class="status-line"><span class="badge ${i.verified?'success':'gray'}">${i.verified?'Verificado':'Por verificar'}</span><span class="badge ${i.status==='Ativo'?'success':'warn'}">${i.status}</span></div></div><div class="item-actions"><button class="btn secondary" data-detail="${i.id}">Ver detalhes</button></div></article>`;
@@ -377,7 +392,7 @@ function bindUserView(){
     $('#sortFilter').onchange = renderItemsList;
     document.querySelectorAll('.cat-btn').forEach(b=>b.onclick=()=>{document.querySelectorAll('.cat-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderItemsList();});
   }
-  document.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>{state.selectedItemId=b.dataset.detail; const item = state.items.find(i=>i.id===b.dataset.detail); if(item) item.views++; state.activeView='detail'; save(); render();});
+  bindDetailButtons();
   document.querySelectorAll('[data-chat-owner]').forEach(b=>b.onclick=()=>openChatWithUser(b.dataset.chatOwner));
   const rf=$('#requestForm'); if(rf){ const update=()=>{ const item=state.items.find(i=>i.id===state.selectedItemId); const days=calcDays($('#startDate').value,$('#endDate').value); $('#costBox').innerHTML = days ? `<div class="summary-row"><span>${days} dia(s)</span><strong>${money(calcTotal(item,days))}</strong></div><div class="tiny">Inclui caução e comissão.</div>` : `<div class="summary-row"><span>Total estimado</span><strong>Seleciona datas</strong></div>`;}; $('#startDate').onchange=update; $('#endDate').onchange=update; rf.onsubmit=(e)=>{e.preventDefault(); const item=state.items.find(i=>i.id===state.selectedItemId); const days=calcDays($('#startDate').value,$('#endDate').value); if(!days){toast('Escolhe datas válidas.'); return;} const r={id:uid('r'), itemId:item.id, itemTitle:item.title, ownerId:item.ownerId, locatarioId:user().id, start:$('#startDate').value, end:$('#endDate').value, days, total:calcTotal(item,days), state:'Pendente', paid:false, received:false, createdAt:new Date().toISOString().slice(0,10)}; state.reservations.push(r); save(); toast('Pedido enviado ao proprietário.'); setView('reservations');}; }
   document.querySelectorAll('[data-accept]').forEach(b=>b.onclick=()=>{const r=state.reservations.find(x=>x.id===b.dataset.accept); r.state='Confirmada'; const item=state.items.find(i=>i.id===r.itemId); if(item) item.status='Alugado'; save(); toast('Pedido aceite.'); render();});
