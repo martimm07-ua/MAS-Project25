@@ -1,113 +1,31 @@
 # MAS Project 25 - Usit
 
-## Descrição do projeto
+## Descrição
+A Usit é uma plataforma de aluguer Peer-to-Peer de objetos de pequeno porte, como ferramentas, dispositivos eletrónicos, material para eventos, fotografia ou desporto, por exemplo. A ideia principal é permitir a partilha de objetos entre pessoas. Um proprietário publica equipamentos parados e um locatário pesquisa, reserva, paga e acompanha o aluguer através da plataforma. Este repositório contém os ficheiros essenciais para o primeiro incremento, que implementa uma versão funcional da interface, sem backend. A aplicação foi construída com HTML, CSS e JavaScript, usando o armazenamento do browser para guardar dados durante a interação com o site. A webapp foi pensada para funcionar tanto em computadores como em ecrãs de telemóvel mais pequenos.
 
-O projeto representa uma plataforma de aluguer P2P de equipamentos, como ferramentas, eletrónicos, objetos de casa, material de eventos, fotografia e desporto.
-
-A ideia principal é permitir a partilha de objetos entre pessoas. Um proprietário publica equipamentos parados e um locatário pesquisa, reserva, paga e acompanha o aluguer através da plataforma.
-
-Este incremento implementa uma versão funcional da interface, sem backend. A aplicação foi construída com HTML, CSS e JavaScript, usando o armazenamento do browser para guardar dados durante a interação com o site.
-
-## Objetivo do incremento
-
+## Fluxos Principais
 Este incremento demonstra os fluxos principais da Usit:
-
-- Login de diferentes perfis
-- Pesquisa de equipamentos
-- Consulta de detalhes de anúncios
-- Contacto com o proprietário
-- Pedido de aluguer
-- Pagamento simulado
-- Confirmação de receção
-- Gestão de itens publicados
-- Edição de anúncios
+- Início de sessão unificado para os diferentes perfis de utilizador
+- Pesquisa de objetos por categoria e por palavra chave
+- Consulta de detalhes de anúncios: descrição, condições, caução, ...
+- Pedidos de aluguer e simulação de pagamentos
+- Gestão e edição de anúncios publicados
 - Dashboard de administrador
 - Dashboard de parceiro comercial
-- Consulta de faturação e dados agregados
 
 ## Credenciais de teste
+- **Utilizador comum, locatário**  
+*Email:* ```rui@usit.pt```  
+*Palavra-passe:* ```usit123```
 
-### Utilizador comum, locatário
+- **Utilizador comum, proprietário**  
+*Email:* ```carla@usit.pt```  
+*Palavra-passe:* ```usit123```
 
-Email:
+- **Administrador**  
+*Email:* ```admin@usit.pt```  
+*Palavra-passe:* ```admin123```
 
-```text
-rui@usit.pt
-```
-
-Palavra-passe:
-
-```text
-usit123
-```
-
-### Utilizador comum, proprietário
-
-Email:
-
-```text
-carla@usit.pt
-```
-
-Palavra-passe:
-
-```text
-usit123
-```
-
-### Administrador
-
-Email:
-
-```text
-admin@usit.pt
-```
-
-Palavra-passe:
-
-```text
-admin123
-```
-
-### Parceiro comercial
-
-Email:
-
-```text
-parceiro@usit.pt
-```
-
-Palavra-passe:
-
-```text
-parceiro123
-```
-
-## Estrutura do projeto
-
-```text
-/
-├── index.html
-├── styles.css
-├── app.js
-└── README.md
-```
-
-## Responsividade
-
-A aplicação foi pensada para funcionar em ecrãs desktop e em ecrãs mais pequenos.
-
-A interface do site adapta-se a dimensões próximas de telemóvel.
-
-## Mehlorias futuras
-
-Próximos passos possíveis:
-
-- Implementar backend
-- Ligar a uma base de dados real
-- Implementar autenticação segura
-- Integrar serviço real de pagamentos
-- Integrar notificações
-- Melhorar validação de identidade
-- Automatizar testes de aceitação
-- Completar fluxo de danos, caução e disputa
+- **Parceiro comercial**  
+*Email:* ```parceiro@usit.pt```  
+*Palavra-passe:* ```parceiro123```
